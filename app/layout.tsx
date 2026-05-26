@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Script
+          id="suppress-hmr-error"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html:
+            'window.addEventListener("unhandledrejection",function(e){if(e.reason&&e.reason.code===-32603)e.preventDefault();});'
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

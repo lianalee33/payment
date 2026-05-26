@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/app/lib/supabase/middleware";
-import { AUTH_ROUTES, PROTECTED_ROUTES } from "@/app/lib/constants";
+import { AUTH_ROUTES } from "@/app/lib/constants";
 
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || "http://localhost:3000")
   .split(",")
@@ -40,14 +40,6 @@ export async function proxy(request: NextRequest) {
 
   // Supabase session refresh + auth gating (non-API routes)
   const { user, supabaseResponse } = await updateSession(request);
-
-  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
-  if (isProtected && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = AUTH_ROUTES.LOGIN;
-    url.searchParams.set("redirectTo", pathname);
-    return NextResponse.redirect(url);
-  }
 
   const isAuthRoute = Object.values(AUTH_ROUTES).some((route) =>
     pathname.startsWith(route),
